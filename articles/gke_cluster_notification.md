@@ -1,18 +1,18 @@
 ---
 title: "GKEクラスタのアップグレードをSlackで通知する"
-emoji: "🙆"
+emoji: "☸️"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["GKE", "PubSub", "CloudFunctions", "Terraform"]
+topics: ["GKE", "PubSub", "CloudFunctions", "Terraform", "slack"]
 published: false
 ---
 # はじめに
 GKEのクラスターは自動でクラスターがアップグレードされてしまうことがあり、知らぬ間に致命的な変更が加わっていて業務に支障を与えたり不具合が発生することがある。
-そのたGKEクラスタがアップグレードした際はSlackへ通知させて、バージョンの把握をしやすくさせる。
+そのためGKEクラスタがアップグレードした際はSlackへ通知させて、バージョンの把握をしやすいようにする。
 
 実装方法は[こちらのドキュメント](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-notifications)を参考に行います。
 # 完成イメージ
 今回は以下のように、GKEクラスタがアップデートされるとSlackで通知がメンションされるようにします。
-![](/images/gke_upgrade_notification.png)
+![](/images/gke_upgrade_notification.png =600x)
 
 # 構成
 
@@ -37,7 +37,7 @@ GKEのバージョンがアップグレードされると、Pub/Subトピック�
 まずは、Pub/Subトピックを作成していきます。
 ```hcl: main.tf
 resource "google_pubsub_topic" "gke_cluster_upgrade_notification_topic" {
-  name = "gke-cluster-upgrade-notification"
+  name = "gke-upgrade-notification"
 }
 ```
 **Terraform:** [google_pubsub_topic](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_topic)
@@ -54,16 +54,19 @@ resource "google_container_cluster" "primary" {
   notification_config {
     pubsub {
       enabled = true
-      topic = "gke-cluster-upgrade-notification"
+      topic = "gke-upgrade-notification"
     }
   }
 }
 ```
 **Terraform:** [google_container_cluster](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster)
-
 作成したら、terraform applyをしてGKEクラスタの通知が有効になっていることを確認します。
+また、GCPコンソールから通知タイプのフィルタリング設定を行います。（terraformが対応していないのでここは、手作業で行います。）
 
-[//]: # (通知のフィルタリング方法について書く terraformでは現状なくコンソールからする必要がある)
+`GKE>クラスタ>クラスタの基本>自動化>通知`
+`バージョン アップグレードの開始`にチェックを入れます。
+![](/images/gke_console.jpg =500x)
+![](/images/notification_filter.png =500x)
 # 3 GCSバケットを作成する
 Cloud Functionsのソースコードを保存するためのGSCバケットを作成します。
 TerraformでCloud Functionsを作成する際、関数のソースコードも必要になります。
@@ -77,6 +80,7 @@ resource "google_storage_bucket" "cloud_functions_package" {
 }
 ```
 **Terraform:** [google_storage_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket)
+terraform applyをしてGCSバケットが作成されているかを確認します。
 
 # 3 Cloud Functionsの関数を作成する
 次にCloud Functionsの関数を作成していきます。
@@ -233,6 +237,7 @@ resource "google_storage_bucket_object" "gke-upgrade-notification-function-zip-s
 **Terraform:** 
 [archive_file](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/archive_file)
 [google_storage_bucket_object](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_object)
+terraform applyをして先ほど作成したGCSにファイルが保存されていることを確認します。
 
 # 5 Cloud Functionsを作成する
 次にCloud Functionsを作成します。
@@ -242,7 +247,7 @@ resource "google_storage_bucket_object" "gke-upgrade-notification-function-zip-s
 [Google Cloud Pub/Sub トリガー](https://cloud.google.com/functions/docs/calling/pubsub)
 ```hcl: main.tf
 resource "google_cloudfunctions_function" "gke_cluster_upgrade_notification_cloud_functions" {
-  name                  = "gke-cluster-upgrade-notification"
+  name                  = "gke-upgrade-notification"
   description           = "GKEイベントアップグレード通知の関数"
   runtime               = "nodejs16"
   source_archive_bucket = "cloud_functions_package"
@@ -255,7 +260,7 @@ resource "google_cloudfunctions_function" "gke_cluster_upgrade_notification_clou
 
   event_trigger {
     event_type = "google.pubsub.topic.publish"
-    resource   = "projects/[project名]/topics/gke-cluster-upgrade-notification"
+    resource   = "projects/[project名]/topics/gke-upgrade-notification"
   }
 }
 
@@ -273,3 +278,13 @@ resource "google_storage_bucket_object" "gke-upgrade-notification-function-zip-s
 
 ```
 **Terraform:** [google_cloudfunctions_function](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudfunctions_function)
+terraform applyをしてCloud Functionsが作成されていることを確認します。
+
+# 6 GKEをアップグレードして、Slackに通知が来ることを確認する
+最後に、GKEをアップグレードして、Slackに通知がくることを確認します。
+
+`GKE>クラスタ>クラスタの基本>リリースチャンネル>アップグレード可能`
+![](/images/gke_upgrade.jpg =600x)
+
+名前と画像はお好きに設定してください。
+![](/images/gke_upgrade_notification.png =600x)
