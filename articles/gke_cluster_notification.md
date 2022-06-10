@@ -6,7 +6,7 @@ topics: ["GKE", "PubSub", "CloudFunctions", "Terraform", "slack"]
 published: false
 ---
 # はじめに
-GKEのクラスターは自動でクラスターがアップグレードされてしまうことがあり、知らぬ間に致命的な変更が加わっていて業務に支障を与えたり不具合が発生することがある。
+GKEのクラスターは自動でクラスターがアップグレードされてしまうことがあり、知らぬ間に致命的な変更が加わっていて業務に支障を与えたり不具合が発生してしまうことがある。
 そのためGKEクラスタがアップグレードした際はSlackへ通知させて、バージョンの把握をしやすいようにする。
 
 実装方法は[こちらのドキュメント](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-notifications)を参考に行います。
