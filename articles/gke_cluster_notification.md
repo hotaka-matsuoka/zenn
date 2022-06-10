@@ -1,6 +1,6 @@
 ---
 title: "GKEクラスタのアップグレードをSlackで通知する"
-emoji: "☸️"
+emoji: ""
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["GKE", "PubSub", "CloudFunctions", "Terraform", "slack"]
 published: false
