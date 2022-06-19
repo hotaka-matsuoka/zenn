@@ -237,6 +237,8 @@ resource "google_storage_bucket_object" "gke-upgrade-notification-function-zip-s
 **Terraform:** 
 [archive_file](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/archive_file)
 [google_storage_bucket_object](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_object)
+ここでの注意点としては、ソース更新をした際にzipファイル名が変更されるようにすることです。
+CloudFunctionsは、入力パラメーターが変更されるとリソースの更新がトリガーされるため、GCSにアップロードする度にzipファイル名が変わるようにします。(そうでないと、デプロイしてもスースコードが更新されません)ここでは、`output_md5`の属性をつけることで対応します。
 terraform applyをして先ほど作成したGCSにファイルが保存されていることを確認します。
 
 # 5 Cloud Functionsを作成する
