@@ -1,3 +1,3 @@
-# Zenn CLI
+📘 執筆記事
 
-* [📘 How to use](https://zenn.dev/zenn/articles/zenn-cli-guide)
+- [GKEクラスタのアップグレードをSlackで通知する](https://zenn.dev/htk1008/articles/gke_cluster_notification)
