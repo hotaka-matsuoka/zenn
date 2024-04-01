@@ -40,7 +40,7 @@ resource "google_pubsub_topic" "gke_cluster_upgrade_notification_topic" {
   name = "gke-upgrade-notification"
 }
 ```
-**Terraform:** [google_pubsub_topic](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_topic)
+🔗**Terraform:** [google_pubsub_topic](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_topic)
 
 作成したら、terraform applyをしてGCPコンソールにPub/Subトピックが作成されることを確認します。
 
@@ -63,7 +63,7 @@ resource "google_container_cluster" "primary" {
   }
 }
 ```
-**Terraform:** [google_container_cluster](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster)
+🔗**Terraform:** [google_container_cluster](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster)
 作成したら、terraform applyをしてGKEクラスターの通知が有効になっていることを確認します。
 
 `GKE` > `クラスタ` > `クラスタの基本` > `自動化` > `通知`
@@ -83,7 +83,7 @@ resource "google_storage_bucket" "cloud_functions_package" {
   storage_class = "COLDLINE"
 }
 ```
-**Terraform:** [google_storage_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket)
+🔗**Terraform:** [google_storage_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket)
 terraform applyをしてGCSバケットが作成されているかを確認します。
 
 # 3 Cloud Functionsの関数を作成する
@@ -118,7 +118,7 @@ Pub/Subから受信するデータは[こちら](https://cloud.google.com/kubern
 :::
 
 
-**参考**
+🔗**参考**
 [Cloud Functions の関数の作成](https://cloud.google.com/kubernetes-engine/docs/tutorials/cluster-notifications-slack#writing_the)
 
 
@@ -238,7 +238,7 @@ resource "google_storage_bucket_object" "gke-upgrade-notification-function-zip-s
   source = data.archive_file.gke-upgrade-notification.output_path
 }
 ```
-**Terraform:** 
+🔗**Terraform:**
 [archive_file](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/archive_file)
 [google_storage_bucket_object](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_object)
 
@@ -250,7 +250,7 @@ terraform applyをして先ほど作成したGCSにファイルが保存され�
 次にCloud Functionsを作成します。
 イベントトリガーに、`google.pubsub.topic.publish`を設定し、環境変数にslackのwebhook URLを追加します。 GCSバケットには、先ほど作成したものを指定します。
 
-**参考**
+🔗**参考**
 [Google Cloud Pub/Sub トリガー](https://cloud.google.com/functions/docs/calling/pubsub)
 ```hcl: main.tf
 resource "google_cloudfunctions_function" "gke_cluster_upgrade_notification_cloud_functions" {
@@ -284,7 +284,7 @@ resource "google_storage_bucket_object" "gke-upgrade-notification-function-zip-s
 }
 
 ```
-**Terraform:** [google_cloudfunctions_function](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudfunctions_function)
+🔗**Terraform:** [google_cloudfunctions_function](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudfunctions_function)
 terraform applyをしてCloud Functionsが作成されていることを確認します。
 
 # 6 GKEをアップグレードして、Slackに通知が来ることを確認する
