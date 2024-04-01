@@ -74,7 +74,7 @@ resource "google_container_cluster" "primary" {
 # 3 GCSバケットを作成する
 Cloud Functionsのソースコードを保存するためのGSCバケットを作成します。
 TerraformでCloud Functionsを作成する際、関数のソースコードも必要になります。
-ちなみにソースコードは、[Cloud Source Repositories](https://cloud.google.com/source-repositories/docs?hl=ja)で管理。もしくはGCSバケットにzipファイルで保存するかの二つの方法がありますが、今回は後者を選択します。
+ちなみにソースコードは、[Cloud Source Repositories](https://cloud.google.com/source-repositories/docs?hl=ja)で管理。GCSバケットにzipファイルで保存するなどの方法がありますが、今回は後者を選択します。
 
 ```hcl: main.tf
 resource "google_storage_bucket" "cloud_functions_package" {
