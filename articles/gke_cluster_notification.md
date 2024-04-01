@@ -56,12 +56,15 @@ resource "google_container_cluster" "primary" {
       enabled = true
       topic = "gke-upgrade-notification"
     }
+    
+    filter {
+      event_type = ["UPGRADE_EVENT"]
+    }
   }
 }
 ```
 **Terraform:** [google_container_cluster](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster)
 作成したら、terraform applyをしてGKEクラスターの通知が有効になっていることを確認します。
-そして、GCPコンソールから通知タイプのフィルタリング設定を行います。（terraformが対応していないのでここは、手作業で行います。）
 
 `GKE` > `クラスタ` > `クラスタの基本` > `自動化` > `通知`
 ![](/images/gke_console.jpg =500x)
