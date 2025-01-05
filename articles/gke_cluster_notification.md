@@ -7,9 +7,9 @@ published: false
 ---
 # はじめに
 GKEのクラスターは自動でクラスターがアップグレードされてしまうことがあり、知らぬ間に致命的な変更が加わっていて業務に支障を与えたり不具合が発生してしまうことがある。
-そのためGKEクラスターがアップグレードした際はSlackへ通知させて、バージョンの把握をしやすいようにする。
+そのためGKEクラスターがアップグレードした際はSlackへ通知させて、バージョンの把握をしやすいようにします。
 
-実装方法は[こちらのドキュメント](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-notifications)を参考に行います。
+実装方法は[こちら]のドキュメント(https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-notifications)を参考に行います。
 # 完成イメージ
 今回は以下のように、GKEクラスターがアップデートされるとSlackで通知がメンションされるようにします。
 ![](/images/gke_upgrade_notification.png =600x)
@@ -31,7 +31,7 @@ GKEのバージョンがアップグレードされると、Pub/Subトピック�
 - Cloud Functions
 - Slack Incoming Webhook
 
-今回はすべてterraformを使用してGCPリソースを作成します。
+gcloudコマンドやコンソール画面から作成可能ですが、今回はすべてterraformを使用してGCPリソースを作成してみたいと思います。
 
 # 1 Pub/Subを作成する
 まずは、Pub/Subトピックを作成します。
@@ -72,7 +72,7 @@ resource "google_container_cluster" "primary" {
 `バージョン アップグレードの開始`にチェックを入れます。
 ![](/images/notification_filter.png =500x)
 # 3 GCSバケットを作成する
-Cloud Functionsのソースコードを保存するためのGSCバケットを作成します。
+Cloud Functionsのソースコードを保存するためのGCSバケットを作成します。
 TerraformでCloud Functionsを作成する際、関数のソースコードも必要になります。
 ちなみにソースコードは、[Cloud Source Repositories](https://cloud.google.com/source-repositories/docs?hl=ja)で管理。GCSバケットにzipファイルで保存するなどの方法がありますが、今回は後者を選択します。
 
@@ -206,9 +206,9 @@ const createSlackMessage = (attributes) => {
 }
 ```
 
-# 4 ソースコードをzip化してGSCにアップロードする
+# 4 ソースコードをzip化してGCSにアップロードする
 次に先ほど作成したCloud Functionsの関数をGCSにアップロードします。
-今回は、以下のようにsrcディレクトリとoutputディレクトリを作成し、[archive_file](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/archive_file)を使用してファイルをzip化しアップロードします。
+今回は、以下のようにsrcディレクトリとoutputディレクトリを作成し、[archive_file](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file)を使用してファイルをzip化しアップロードします。
 
 
 ```:tree
@@ -239,7 +239,7 @@ resource "google_storage_bucket_object" "gke-upgrade-notification-function-zip-s
 }
 ```
 🔗 **Terraform:**
-[archive_file](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/archive_file)
+[archive_file](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file)
 [google_storage_bucket_object](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_object)
 
 ここでの注意点としては、ソース更新をした際にzipファイル名が変更されるようにすることです。
